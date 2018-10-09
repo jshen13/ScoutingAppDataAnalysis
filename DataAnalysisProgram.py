@@ -135,7 +135,7 @@ def transfer_auto_data(data_sheet, output_sheet, d_row, o_row):
 #   set TOTAL
     output_sheet.cell(o_row, 4).value = int(data_sheet.cell(d_row, 6).value) + int(data_sheet.cell(d_row, 4).value)
 
-def calc_avg(output_sheet, matches_played, col):
+def calc_avg(output_sheet, matches_played):
     '''
     Calculates both averages from auto and teleop data
     :param output_sheet: team sheet
@@ -147,13 +147,49 @@ def calc_avg(output_sheet, matches_played, col):
     # AUTO
     # ----------------------------
     # average switch
-  #  output_sheet.cell(4,7).value =
+    a_switch_sum = 0
+    a_scale_sum = 0
+  # finds sum of all the switch and scale cubes
+    for i in range(4, 4 + matches_played - 1, 1):
+        a_switch_sum += output_sheet.cell(i,2).value
+        a_scale_sum += output_sheet.cell(i,3).value
+# prints out average to the Excel sheet
+    if matches_played == 0:
+        output_sheet.cell(4, 7).value = 0
+        output_sheet.cell(4, 8).value = 0
+    else:
+        output_sheet.cell(4, 7).value = float(a_switch_sum)/matches_played
+        output_sheet.cell(4, 8).value = float(a_scale_sum)/matches_played
+
+
+    # TELE
+    # ------------------------------
+    t_switch_sum = 0
+    t_vault_sum = 0
+    t_scale_sum = 0
+
+    for i in range(21, 21 + matches_played, 1):
+        t_switch_sum += output_sheet.cell(i, 2).value
+        t_vault_sum += output_sheet.cell(i, 3).value
+        t_scale_sum += output_sheet.cell(i, 4).value
+
+    if matches_played == 0:
+        output_sheet.cell(21, 9).value = 0
+        output_sheet.cell(21, 10).value = 0
+        output_sheet.cell(21, 11).value = 0
+    else:
+        output_sheet.cell(21, 9).value = float(t_switch_sum)/matches_played
+        output_sheet.cell(21, 10).value = float(t_vault_sum)/matches_played
+        output_sheet.cell(21, 11).value = float(t_scale_sum)/matches_played
 
 
 
-# ---------------------------------------------------------------------------
-#                           MAIN CODE
-# ---------------------------------------------------------------------------
+#
+#
+#
+# ----------------------------------------------------------------------------------------------------------------------
+#                                               MAIN CODE
+# ----------------------------------------------------------------------------------------------------------------------
 # instantiate new variables
 # data is the excel sheet with all the scouting data
 data = openpyxl.load_workbook('2018_LA_Regional_Data.xlsx')
@@ -165,7 +201,7 @@ tele = data['Tele']
 
 # Creating new workbook to store organized data
 teamOutput = openpyxl.Workbook()
-teamOutput_name = 'LATeamDataTest4.xlsx'
+teamOutput_name = 'LATeamDataTest7.xlsx'
 teamSheet = teamOutput.active
 
 # ------------------------
@@ -224,6 +260,9 @@ for i in range(4, 250, 1): # row 4 is start of data
     # -------------------------------------------------------------------
     # NEW TEAM NUMBER
     else:
+        # calculate the averages of the previous team
+        calc_avg(teamSheet, played)
+        teamSheet.cell(1,1).value = played
         lastTeam = tele.cell(i,2).value #  start of different team num
         teamOutput.create_sheet(str(lastTeam))
         teamSheet = teamOutput[str(lastTeam)]
