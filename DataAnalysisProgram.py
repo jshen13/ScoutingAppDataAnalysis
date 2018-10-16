@@ -46,9 +46,11 @@ def sheet_setup(sheet, teamnum):
     # col 5 - total cubes
     # col 6 - climb
     # col 7 - result
-    # col 9 - avg switch
-    # col 10 - avg vault
-    # col 11 - avg scale
+    # col 8 - notes
+
+    # col 10 - avg switch
+    # col 11 - avg vault
+    # col 12 - avg scale
     # input is the Excel sheet
     # TELEOP
     sheet.cell(19, 2).value = "TELEOP"
@@ -60,9 +62,10 @@ def sheet_setup(sheet, teamnum):
     sheet.cell(20,5).value = "Total"
     sheet.cell(20,6).value = "Climb"
     sheet.cell(20,7).value = "Result"
-    sheet.cell(20,9).value = "AVG Switch"
-    sheet.cell(20,10).value = "AVG Vault"
-    sheet.cell(20,11).value = "AVG Scale"
+    sheet.cell(20,8).value = "Notes"
+    sheet.cell(20,10).value = "AVG Switch"
+    sheet.cell(20,11).value = "AVG Vault"
+    sheet.cell(20,12).value = "AVG Scale"
 
 # --------------------------------------------------------------------------------------
 
@@ -85,9 +88,11 @@ def transfer_tele_data(data_sheet, output_sheet, d_row, o_row):
     # col 5 - total cubes
     # col 6 - climb
     # col 7 - result
-    # col 9 - avg switch
-    # col 10 - avg vault
-    # col 11 - avg scale
+    # col 8 - notes
+
+    # col 10 - avg switch
+    # col 11 - avg vault
+    # col 12 - avg scale
 
     #   set MATCH NUM
     output_sheet.cell(o_row, 1).value = data_sheet.cell(d_row, 3).value
@@ -104,6 +109,9 @@ def transfer_tele_data(data_sheet, output_sheet, d_row, o_row):
     output_sheet.cell(o_row, 6).value = data_sheet.cell(d_row, 7).value
 #   set RESULT
     output_sheet.cell(o_row, 7).value = data_sheet.cell(d_row, 8).value
+
+#   set NOTES
+    output_sheet.cell(o_row, 8).value = data_sheet.cell(d_row, 9).value
 
 # -----------------------------------------------------------------------
 
@@ -150,6 +158,11 @@ def print_team_stat(overall_team_sheet, row, team, stat_list):
     overall_team_sheet.cell(row, 5).value = stat_list[3]
     overall_team_sheet.cell(row, 6).value = stat_list[4]
 
+
+
+
+
+
     # weight factors of each part that makes up the score. Can be adjusted
     # ----------------------------------------------------------------------------------------
     a_switch_factor = 1
@@ -158,6 +171,8 @@ def print_team_stat(overall_team_sheet, row, team, stat_list):
     t_vault_factor = 1.2
     t_scale_factor = 3.6
     # ----------------------------------------------------------------------------------------
+
+
 
 
     score = a_switch_factor * stat_list[0] + a_scale_factor * stat_list[1] + \
@@ -182,7 +197,7 @@ def calc_avg(output_sheet, matches_played):
     a_switch_sum = 0
     a_scale_sum = 0
   # finds sum of all the switch and scale cubes
-    for i in range(4, 4 + matches_played - 1, 1):
+    for i in range(4, 4 + matches_played, 1):
         a_switch_sum += output_sheet.cell(i,2).value
         a_scale_sum += output_sheet.cell(i,3).value
 # prints out average to the Excel sheet
@@ -206,43 +221,63 @@ def calc_avg(output_sheet, matches_played):
         t_scale_sum += output_sheet.cell(i, 4).value
 
     if matches_played == 0:
-        output_sheet.cell(21, 9).value = 0
         output_sheet.cell(21, 10).value = 0
         output_sheet.cell(21, 11).value = 0
+        output_sheet.cell(21, 12).value = 0
     else:
-        output_sheet.cell(21, 9).value = float(t_switch_sum)/matches_played
-        output_sheet.cell(21, 10).value = float(t_vault_sum)/matches_played
-        output_sheet.cell(21, 11).value = float(t_scale_sum)/matches_played
-
+        output_sheet.cell(21, 10).value = float(t_switch_sum)/matches_played
+        output_sheet.cell(21, 11).value = float(t_vault_sum)/matches_played
+        output_sheet.cell(21, 12).value = float(t_scale_sum)/matches_played
 
     return [output_sheet.cell(4, 7).value, output_sheet.cell(4, 8).value,
-            output_sheet.cell(21, 9).value, output_sheet.cell(21, 10).value , output_sheet.cell(21, 11).value]
+            output_sheet.cell(21, 10).value, output_sheet.cell(21, 11).value , output_sheet.cell(21, 12).value]
+
+
 
 
 
 
 
 #
-#
-#
+
+# ----------------------------------------------------------------------------------------------------------------------
 # ----------------------------------------------------------------------------------------------------------------------
 #                                               MAIN CODE
 # ----------------------------------------------------------------------------------------------------------------------
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
 # instantiate new variables
 # data is the excel sheet with all the scouting data
-data = openpyxl.load_workbook('2018_LA_Regional_Data.xlsx')
+
+
+# -----------------------------------------------------------------------------------
+                                 #   INPUT FILE NAME
+data = openpyxl.load_workbook('2018_BB_Data.xlsx')           # <<< Change Name of Input File
+
+# -----------------------------------------------------------------------------------
 # auto sheet of the scouting data Excel file
 auto = data['Auto']
 # tele sheet of the scouting data Excel file
 tele = data['Tele']
-max_row = auto.max_row - 29
 
 
 
 
 # Creating new workbook to store organized data
 teamOutput = openpyxl.Workbook()
-teamOutput_name = 'LATeamDataTest8.xlsx'
+
+# -----------------------------------------------------------------------------------
+                                #    OUTPUT FILE NAME
+teamOutput_name = '2018BeachBlitzDataAnalysis1.xlsx'             # <<< Change Name of Output File
+
+# -----------------------------------------------------------------------------------
+
+
 teamSheet = teamOutput.active
 teamSheet.title = "Overall Team"
 
@@ -281,9 +316,12 @@ teamOutput.create_sheet(str(lastTeam))
 teamSheet = teamOutput[str(lastTeam)]  # set the first team sheet title to the first team
 sheet_setup(teamSheet, lastTeam)
 
-
+# ask for number of number of matches
+print "How many data points is there?"
+matches = int(raw_input("Data Points:"))
 
 played = 0
+
 team_count = 0
 # data to keep overall track of
 teams_switch_avg = []
@@ -300,19 +338,20 @@ teams_vault_avg = []
 # col 9 - avg vault
 # col 10 - avg scale
 
-for i in range(4, 320, 1): # row 4 is start of data
+for i in range(4, matches + 2, 1): # row 4 is start of data
     # ------------------------------------------------------------------
     # SAME TEAM NUMBER
     if lastTeam == tele.cell(i,2).value: #  if same team num add to sum counter
 
         # Set match num
-        #ROW starts at 3
+        # ROW starts at 3
         # auto starts at 4
         # teleop starts at 21
+
         transfer_auto_data(auto, teamSheet, i, 4 + played)
         transfer_tele_data(tele, teamSheet, i, 21 + played)
-
         played += 1
+
     # -------------------------------------------------------------------
     # NEW TEAM NUMBER
     else:
@@ -322,12 +361,18 @@ for i in range(4, 320, 1): # row 4 is start of data
         print_team_stat(teamOutput["Overall Team"], 3 + team_count, lastTeam, team_stat_list)
 
         teamSheet.cell(1,1).value = played
-        lastTeam = tele.cell(i,2).value      #  start of different team num
+
+        #  start of different team num
+        lastTeam = tele.cell(i,2).value
         teamOutput.create_sheet(str(lastTeam))
         teamSheet = teamOutput[str(lastTeam)]
         sheet_setup(teamSheet, lastTeam)
 
-        played = 0
+        # need to transfer data for first tele value
+        transfer_auto_data(auto, teamSheet, i, 4)
+        transfer_tele_data(tele, teamSheet, i, 21)
+        played = 1
+        # increment team count
         team_count += 1
 
 
