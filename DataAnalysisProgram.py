@@ -65,24 +65,24 @@ def sheet_setup(sheet, teamnum):
     # col 15 - avg scale
     # input is the Excel sheet
     # TELEOP
-    sheet.cell(19, 2).value = "TELEOP"
+    sheet.cell(24, 2).value = "TELEOP"
 
-    sheet.cell(20,1).value = "Match Num"
-    sheet.cell(20,2).value = "Cargo Level 1"
-    sheet.cell(20,3).value = "Cargo Level 2/Cargo ship"
-    sheet.cell(20,4).value = "Cargo Level 3"
-    sheet.cell(20,5).value = "Hatch Level 1"
-    sheet.cell(20,6).value = "Hatch Level 2"
-    sheet.cell(20,7).value = "Hatch Level 3"
-    sheet.cell(20,8).value = "Climb"
-    sheet.cell(20,9).value = "Notes"
-    sheet.cell(20,10).value = "Total Cargo"
-    sheet.cell(20,11).value = "Total Hatch"
+    sheet.cell(25,1).value = "Match Num"
+    sheet.cell(25,2).value = "Cargo Level 1"
+    sheet.cell(25,3).value = "Cargo Level 2/Cargo ship"
+    sheet.cell(25,4).value = "Cargo Level 3"
+    sheet.cell(25,5).value = "Hatch Level 1"
+    sheet.cell(25,6).value = "Hatch Level 2"
+    sheet.cell(25,7).value = "Hatch Level 3"
+    sheet.cell(25,8).value = "Climb"
+    sheet.cell(25,9).value = "Notes"
+    sheet.cell(25,10).value = "Total Cargo"
+    sheet.cell(25,11).value = "Total Hatch"
 
 
-    sheet.cell(20,13).value = "AVG Cargo"
-    sheet.cell(20,14).value = "AVG Hatch"
-    sheet.cell(20,15).value = "AVG Climb"
+    sheet.cell(25,13).value = "AVG Cargo"
+    sheet.cell(25,14).value = "AVG Hatch"
+    sheet.cell(25,15).value = "AVG Climb"
 
 # --------------------------------------------------------------------------------------
 
@@ -131,17 +131,15 @@ def transfer_tele_data(data_sheet, output_sheet, d_row, o_row):
 
 #   set NOTES
     output_sheet.cell(o_row, 9).value = data_sheet.cell(d_row, 11).value
-
     #   set TOTAL CARGO
-    output_sheet.cell(o_row, 10).value = int(data_sheet.cell(o_row, 2).value) + int(output_sheet.cell(o_row, 3).value) \
-        + int(output_sheet.cell(o_row, 4).value)
 
+    output_sheet.cell(o_row, 10).value = int(output_sheet.cell(o_row, 2).value) + int(output_sheet.cell(o_row, 3).value) \
+      + int(output_sheet.cell(o_row, 4).value)
 
-
-    #   set TOTAL HATCH
-    output_sheet.cell(o_row, 11).value = int(data_sheet.cell(o_row, 5).value) + int(output_sheet.cell(o_row, 6).value) \
+#   set TOTAL HATCH
+    output_sheet.cell(o_row, 11).value = int(output_sheet.cell(o_row, 5).value) + int(output_sheet.cell(o_row, 6).value) \
         + int(output_sheet.cell(o_row, 7).value)
-
+    print(o_row)
 # -----------------------------------------------------------------------
 
 def transfer_auto_data(data_sheet, output_sheet, d_row, o_row):
@@ -184,7 +182,7 @@ def transfer_auto_data(data_sheet, output_sheet, d_row, o_row):
     output_sheet.cell(o_row, 8).value = data_sheet.cell(d_row, 10).value
 
 #   set TOTAL
-#    output_sheet.cell(o_row, 4).value = int(output_sheet.cell(o_row, 3).value) + int(output_sheet.cell(o_row, 2).value)
+    output_sheet.cell(o_row, 4).value = int(output_sheet.cell(o_row, 3).value) + int(output_sheet.cell(o_row, 2).value)
 
 def print_team_stat(overall_team_sheet, row, team, stat_list):
     # 1) = "Team Num"
@@ -233,7 +231,8 @@ def calc_avg(output_sheet, matches_played):
     a_hatch_sum = 0
   # finds sum of all the switch and scale cubes
     for i in range(4, 4 + matches_played, 1):
-        a_cargo_sum += output_sheet.cell(i,3).value + output_sheet.cell(i,4).value + output_sheet.cell(i,5).value
+
+        a_cargo_sum += int(output_sheet.cell(i,3).value) + int(output_sheet.cell(i,4).value) + int(output_sheet.cell(i,5).value)
         a_hatch_sum += output_sheet.cell(i,6).value + output_sheet.cell(i,7).value + output_sheet.cell(i,8).value
 # prints out average to the Excel sheet
     if matches_played == 0:
@@ -264,7 +263,7 @@ def calc_avg(output_sheet, matches_played):
     t_hatch_sum = 0
     t_climb_sum = 0
 
-    for i in range(21, 21 + matches_played, 1):
+    for i in range(26, 26 + matches_played, 1):
         t_cargo_sum += output_sheet.cell(i, 2).value + output_sheet.cell(i, 3).value + output_sheet.cell(i, 4).value
         t_hatch_sum += output_sheet.cell(i, 5).value + output_sheet.cell(i, 6).value + output_sheet.cell(i, 7).value
 
@@ -278,16 +277,16 @@ def calc_avg(output_sheet, matches_played):
             t_climb_sum += 0
 
     if matches_played == 0:
-        output_sheet.cell(21, 13).value = 0
-        output_sheet.cell(21, 14).value = 0
-        output_sheet.cell(21, 15).value = 0
+        output_sheet.cell(26, 13).value = 0
+        output_sheet.cell(26, 14).value = 0
+        output_sheet.cell(26, 15).value = 0
     else:
-        output_sheet.cell(21, 13).value = float(t_cargo_sum)/matches_played
-        output_sheet.cell(21, 14).value = float(t_hatch_sum)/matches_played
-        output_sheet.cell(21, 15).value = float(t_climb_sum)/matches_played
+        output_sheet.cell(26, 13).value = float(t_cargo_sum)/matches_played
+        output_sheet.cell(26, 14).value = float(t_hatch_sum)/matches_played
+        output_sheet.cell(26, 15).value = float(t_climb_sum)/matches_played
 
     return [output_sheet.cell(4, 10).value, output_sheet.cell(4,11).value,
-            output_sheet.cell(21, 13).value, output_sheet.cell(21, 14).value , output_sheet.cell(21, 15).value]
+            output_sheet.cell(26, 13).value, output_sheet.cell(26, 14).value , output_sheet.cell(26, 15).value]
 
 
 
@@ -314,7 +313,7 @@ def calc_avg(output_sheet, matches_played):
 
 # -----------------------------------------------------------------------------------
                                  #   INPUT FILE NAME
-data = openpyxl.load_workbook('2019_LosAngelesRegional_Data.xlsx')           # <<< Change Name of Input File
+data = openpyxl.load_workbook('2019LVRegionalData.xlsx')           # <<< Change Name of Input File
 
 # -----------------------------------------------------------------------------------
 # auto sheet of the scouting data Excel file
@@ -330,7 +329,7 @@ teamOutput = openpyxl.Workbook()
 
 # -----------------------------------------------------------------------------------
                                 #    OUTPUT FILE NAME
-teamOutput_name = '2019LosAngelesDataAnalysis.xlsx'             # <<< Change Name of Output File
+teamOutput_name = '2019LVDataAnalysis.xlsx'             # <<< Change Name of Output File
 
 # -----------------------------------------------------------------------------------
 
@@ -403,15 +402,18 @@ for i in range(4, matches + 2, 1): # row 4 is start of data
     # ------------------------------------------------------------------
     # SAME TEAM NUMBER
     if lastTeam == tele.cell(i,2).value: #  if same team num add to sum counter
-
+        transfer_tele_data(tele, teamSheet, i, 26 + played)
+        transfer_auto_data(auto, teamSheet, i, 4 + played)
+        played += 1
         # Set match num
         # ROW starts at 3
         # auto starts at 4
         # teleop starts at 21
 
-        transfer_auto_data(auto, teamSheet, i, 4 + played)
-        transfer_tele_data(tele, teamSheet, i, 21 + played)
-        played += 1
+
+
+
+
 
     # -------------------------------------------------------------------
     # NEW TEAM NUMBER
@@ -431,7 +433,7 @@ for i in range(4, matches + 2, 1): # row 4 is start of data
 
         # need to transfer data for first tele value
         transfer_auto_data(auto, teamSheet, i, 4)
-        transfer_tele_data(tele, teamSheet, i, 21)
+        transfer_tele_data(tele, teamSheet, i, 26)
         played = 1
         # increment team count
         team_count += 1
